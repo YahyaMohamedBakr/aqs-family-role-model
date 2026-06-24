@@ -83,7 +83,8 @@ defined('ABSPATH') || exit;
 
                 <!-- Questions -->
                 <template x-for="(q, index) in currentAxisQuestions" :key="q.id">
-                    <div class="aqs-question">
+                    <div class="aqs-question"
+                         :class="{ 'aqs-question-missing': !q.answered && axisErrors.length > 0 }">
                         <div class="aqs-question-text">
                             <span class="aqs-question-number" x-text="q.number"></span>
                             <span x-text="q.text"></span>
@@ -106,6 +107,20 @@ defined('ABSPATH') || exit;
                         </div>
                     </div>
                 </template>
+
+                <!-- Axis Validation Error -->
+                <div x-show="axisErrors.length > 0"
+                     x-cloak
+                     style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 12px; padding: 16px 20px; margin-top: 20px; display: flex; align-items: flex-start; gap: 12px;">
+                    <i class="fas fa-exclamation-triangle" style="color: #d97706; font-size: 1.1rem; margin-top: 2px; flex-shrink: 0;"></i>
+                    <div>
+                        <strong style="color: #92400e; font-size: 0.9rem;"><?php esc_html_e('يرجى الإجابة على جميع الأسئلة', 'aqs-family-role-model'); ?></strong>
+                        <p style="color: #b45309; font-size: 0.85rem; margin: 4px 0 0; line-height: 1.6;">
+                            <?php esc_html_e('لم يتم الإجابة على الأسئلة التالية:', 'aqs-family-role-model'); ?>
+                            <span x-text="axisErrors.join('، ')"></span>
+                        </p>
+                    </div>
+                </div>
 
                 <!-- Navigation -->
                 <div class="aqs-nav">

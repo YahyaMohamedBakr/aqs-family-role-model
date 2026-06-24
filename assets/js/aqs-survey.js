@@ -23,6 +23,7 @@ document.addEventListener('alpine:init', () => {
 
         // Validation errors
         errors: {},
+        axisErrors: [],
 
         // Results
         result: null,
@@ -70,12 +71,20 @@ document.addEventListener('alpine:init', () => {
         get currentAxisQuestions() {
             const key = this.currentAxisKey;
             const qs = this.questions[key] || [];
-            const axes = this.axes;
             return qs.map((q, i) => ({
                 id: key + '_q' + i,
                 text: q,
                 number: this.getGlobalQuestionNumber(key, i),
+                answered: this.answers[key + '_q' + i] >= 1 && this.answers[key + '_q' + i] <= 5,
             }));
+        },
+
+        get currentAxisUnanswered() {
+            return this.currentAxisQuestions.filter(q => !q.answered);
+        },
+
+        get currentAxisAllAnswered() {
+            return this.currentAxisUnanswered.length === 0;
         },
 
         get globalQuestionStart() {
@@ -178,10 +187,18 @@ document.addEventListener('alpine:init', () => {
         },
 
         nextAxis() {
+            this.axisErrors = [];
+
+            if (!this.currentAxisAllAnswered) {
+                this.axisErrors = this.currentAxisUnanswered.map(q => q.number);
+                return;
+            }
+
             if (this.isLastAxis) {
                 this.submitSurvey();
             } else {
                 this.currentAxis++;
+                this.axisErrors = [];
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         },
