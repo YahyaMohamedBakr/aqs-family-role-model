@@ -118,7 +118,17 @@ class AQS_Ajax_Handlers {
         }
 
         global $wpdb;
-        $table_contacts = $wpdb->prefix . AQS_TABLE_CONTACTS;
+        $table_responses = $wpdb->prefix . AQS_TABLE_RESPONSES;
+        $table_contacts  = $wpdb->prefix . AQS_TABLE_CONTACTS;
+
+        $response_exists = $wpdb->get_var($wpdb->prepare(
+            "SELECT id FROM {$table_responses} WHERE id = %d",
+            $response_id
+        ));
+
+        if (!$response_exists) {
+            wp_send_json_error(array('message' => __('الاستجابة غير موجودة', 'aqs-family-role-model')));
+        }
 
         $wpdb->insert(
             $table_contacts,
@@ -131,8 +141,7 @@ class AQS_Ajax_Handlers {
             array('%d', '%s', '%s', '%s')
         );
 
-        $table_responses = $wpdb->prefix . AQS_TABLE_RESPONSES;
-        $user_data       = $wpdb->get_row($wpdb->prepare(
+        $user_data = $wpdb->get_row($wpdb->prepare(
             "SELECT full_name, email, total_score, classification FROM {$table_responses} WHERE id = %d",
             $response_id
         ));
